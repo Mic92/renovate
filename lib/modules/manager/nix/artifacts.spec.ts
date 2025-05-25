@@ -55,7 +55,7 @@ describe('modules/manager/nix/artifacts', () => {
   it('returns if no flake.lock found', async () => {
     const execSnapshots = mockExecAll();
     const res = await updateArtifacts({
-      packageFileName: 'flake.nix',
+      packageFileName: 'flake.lock',
       updatedDeps: [],
       newPackageFileContent: '',
       config,
@@ -75,7 +75,7 @@ describe('modules/manager/nix/artifacts', () => {
     );
 
     const res = await updateArtifacts({
-      packageFileName: 'flake.nix',
+      packageFileName: 'flake.lock',
       updatedDeps: [{ depName: 'nixpkgs' }],
       newPackageFileContent: 'some new content',
       config,
@@ -96,7 +96,7 @@ describe('modules/manager/nix/artifacts', () => {
     fs.readLocalFile.mockResolvedValueOnce('new flake.lock');
 
     const res = await updateArtifacts({
-      packageFileName: 'flake.nix',
+      packageFileName: 'flake.lock',
       updatedDeps: [{ depName: 'nixpkgs' }],
       newPackageFileContent: 'some new content',
       config: { ...config, constraints: { python: '3.7' } },
@@ -126,7 +126,7 @@ describe('modules/manager/nix/artifacts', () => {
     hostRules.find.mockReturnValueOnce({ token: 'token' });
 
     const res = await updateArtifacts({
-      packageFileName: 'flake.nix',
+      packageFileName: 'flake.lock',
       updatedDeps: [{ depName: 'nixpkgs' }],
       newPackageFileContent: 'some new content',
       config: { ...config, constraints: { python: '3.7' } },
@@ -156,7 +156,7 @@ describe('modules/manager/nix/artifacts', () => {
     hostRules.find.mockReturnValueOnce({ token: 'x-access-token:token' });
 
     const res = await updateArtifacts({
-      packageFileName: 'flake.nix',
+      packageFileName: 'flake.lock',
       updatedDeps: [{ depName: 'nixpkgs' }],
       newPackageFileContent: 'some new content',
       config: { ...config, constraints: { python: '3.7' } },
@@ -185,7 +185,7 @@ describe('modules/manager/nix/artifacts', () => {
     fs.readLocalFile.mockResolvedValueOnce('new flake.lock');
 
     const res = await updateArtifacts({
-      packageFileName: 'flake.nix',
+      packageFileName: 'flake.lock',
       updatedDeps: [{ depName: 'nixpkgs' }],
       newPackageFileContent: '{}',
       config: { ...config, constraints: { nix: '2.10.0' } },
@@ -230,7 +230,7 @@ describe('modules/manager/nix/artifacts', () => {
     fs.readLocalFile.mockResolvedValueOnce('new flake.lock');
 
     const res = await updateArtifacts({
-      packageFileName: 'flake.nix',
+      packageFileName: 'flake.lock',
       updatedDeps: [{ depName: 'nixpkgs' }],
       newPackageFileContent: '{}',
       config: { ...config, constraints: { nix: '2.10.0' } },
@@ -258,7 +258,7 @@ describe('modules/manager/nix/artifacts', () => {
     const execSnapshots = mockExecSequence([new Error('exec error')]);
 
     const res = await updateArtifacts({
-      packageFileName: 'flake.nix',
+      packageFileName: 'flake.lock',
       updatedDeps: [{ depName: 'nixpkgs' }],
       newPackageFileContent: '{}',
       config,
@@ -283,7 +283,7 @@ describe('modules/manager/nix/artifacts', () => {
     fs.readLocalFile.mockResolvedValueOnce('new flake.lock');
 
     const res = await updateArtifacts({
-      packageFileName: 'flake.nix',
+      packageFileName: 'flake.lock',
       updatedDeps: [{ depName: 'nixpkgs' }],
       newPackageFileContent: '{}',
       config: lockMaintenanceConfig,
@@ -312,7 +312,7 @@ describe('modules/manager/nix/artifacts', () => {
     fs.readLocalFile.mockResolvedValueOnce('new lock');
 
     const res = await updateArtifacts({
-      packageFileName: 'flake.nix',
+      packageFileName: 'flake.lock',
       updatedDeps: [{ depName: 'nixpkgs' }],
       newPackageFileContent: 'some new content',
       config: {
