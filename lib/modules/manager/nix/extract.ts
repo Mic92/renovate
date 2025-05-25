@@ -14,6 +14,13 @@ const lockableHTTPTarballProtocol = regEx(
   '^https://(?<domain>[^/]+)/(?<owner>[^/]+)/(?<repo>[^/]+)/archive/(?<rev>.+).tar.gz$',
 );
 
+const lockableChannelOriginalUrl = regEx(
+  '^https://nixos.org/channels/(?<channel>[^/]+)/nixexprs.tar.xz$',
+);
+const lockableChannelLockedUrl = regEx(
+  '^https://releases.nixos.org/nixpkgs/(?<channel>[^/-]+)-(?<release>[^/]+)pre[0-9]+.(?<ref>[^/]+)/nixexprs.tar.xz$',
+);
+
 export async function extractPackageFile(
   content: string,
   packageFile: string,
@@ -91,6 +98,14 @@ export async function extractPackageFile(
       continue;
     }
 
+    const isLockableTarball =
+      flakeOriginal.url && lockableChannelOriginalUrl.test(flakeOriginal.url);
+
+    // if no rev is being tracked, we cannot update this input
+    if (flakeLocked.rev === undefined && !isLockableTarball) {
+      continue;
+    }
+
     switch (flakeLocked.type) {
       case 'github':
         deps.push({
@@ -133,17 +148,37 @@ export async function extractPackageFile(
         });
         break;
       case 'tarball':
-        deps.push({
-          depName,
-          currentValue: flakeLocked.ref,
-          currentDigest: flakeLocked.rev,
-          datasource: GitRefsDatasource.id,
-          // type tarball always contains this link
-          packageName: flakeOriginal.url!.replace(
-            lockableHTTPTarballProtocol,
-            'https://$<domain>/$<owner>/$<repo>',
-          ),
-        });
+        if (isLockableTarball) {
+          const branch = flakeOriginal.url!.replace(
+            lockableChannelOriginalUrl,
+            '$<channel>',
+          );
+          const rev = flakeLocked.url!.replace(
+            lockableChannelLockedUrl,
+            '$<ref>',
+          );
+          deps.push({
+            depName,
+            currentValue: branch,
+            currentDigest: rev,
+            datasource: GitRefsDatasource.id,
+            packageName: 'https://github.com/NixOS/nixpkgs',
+            rangeStrategy: 'update-lockfile',
+          });
+        } else {
+          deps.push({
+            depName,
+            currentValue: flakeLocked.ref,
+            currentDigest: flakeLocked.rev,
+            datasource: GitRefsDatasource.id,
+            // type tarball always contains this link
+            packageName: flakeOriginal.url!.replace(
+              lockableHTTPTarballProtocol,
+              'https://$<domain>/$<owner>/$<repo>',
+            ),
+            rangeStrategy: 'update-lockfile',
+          });
+        }
         break;
       // istanbul ignore next: just a safeguard
       default:

@@ -909,4 +909,43 @@ describe('modules/manager/nix/extract', () => {
       ],
     });
   });
+
+  it('includes flake with nixpkgs channel as tarball type', async () => {
+    const flakeLock = codeBlock`{
+    "nodes": {
+      "nixpkgs": {
+        "locked": {
+          "lastModified": 315532800,
+          "narHash": "sha256-OBkwS4XoKsUwM8ykjEN1JLg/SI/SHOVJbrwMfK64BJo=",
+          "type": "tarball",
+          "url": "https://releases.nixos.org/nixpkgs/nixpkgs-25.05pre766138.b62d2a95c72f/nixexprs.tar.xz"
+        },
+        "original": {
+          "type": "tarball",
+          "url": "https://nixos.org/channels/nixpkgs-unstable/nixexprs.tar.xz"
+        }
+      },
+      "root": {
+        "inputs": {
+          "nixpkgs": "nixpkgs"
+        }
+      }
+    },
+    "root": "root",
+    "version": 7
+  }`;
+    fs.readLocalFile.mockResolvedValueOnce(flakeLock);
+    expect(await extractPackageFile('', 'flake.nix')).toMatchObject({
+      deps: [
+        {
+          currentDigest: 'b62d2a95c72f',
+          currentValue: 'nixpkgs-unstable',
+          datasource: 'git-refs',
+          depName: 'nixpkgs',
+          packageName: 'https://github.com/NixOS/nixpkgs',
+          rangeStrategy: 'update-lockfile',
+        },
+      ],
+    });
+  });
 });
