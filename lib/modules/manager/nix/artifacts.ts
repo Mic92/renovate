@@ -7,7 +7,6 @@ import type { ExecOptions } from '../../../util/exec/types';
 import { readLocalFile } from '../../../util/fs';
 import { getRepoStatus } from '../../../util/git';
 import * as hostRules from '../../../util/host-rules';
-import { regEx } from '../../../util/regex';
 import type { UpdateArtifact, UpdateArtifactsResult } from '../types';
 
 export async function updateArtifacts({
@@ -15,7 +14,7 @@ export async function updateArtifacts({
   config,
   updatedDeps,
 }: UpdateArtifact): Promise<UpdateArtifactsResult[] | null> {
-  const lockFileName = packageFileName.replace(regEx(/\.nix$/), '.lock');
+  const lockFileName = packageFileName;
   const existingLockFileContent = await readLocalFile(lockFileName, 'utf8');
   if (!existingLockFileContent) {
     logger.debug('No flake.lock found');

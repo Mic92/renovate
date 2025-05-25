@@ -1,5 +1,5 @@
 import { logger } from '../../../logger';
-import { getSiblingFileName, readLocalFile } from '../../../util/fs';
+import { readLocalFile } from '../../../util/fs';
 import { regEx } from '../../../util/regex';
 import { GitRefsDatasource } from '../../datasource/git-refs';
 import { id as nixpkgsVersioning } from '../../versioning/nixpkgs';
@@ -25,10 +25,9 @@ export async function extractPackageFile(
   content: string,
   packageFile: string,
 ): Promise<PackageFileContent | null> {
-  const packageLockFile = getSiblingFileName(packageFile, 'flake.lock');
-  const lockContents = await readLocalFile(packageLockFile, 'utf8');
+  const lockContents = await readLocalFile(packageFile, 'utf8');
 
-  logger.trace(`nix.extractPackageFile(${packageLockFile})`);
+  logger.debug(`nix.extractPackageFile(${packageFile})`);
 
   const deps: PackageDependency[] = [];
 
@@ -47,7 +46,7 @@ export async function extractPackageFile(
   const flakeLockParsed = NixFlakeLock.safeParse(lockContents);
   if (!flakeLockParsed.success) {
     logger.debug(
-      { packageLockFile, error: flakeLockParsed.error },
+      { packageFile, error: flakeLockParsed.error },
       `invalid flake.lock file`,
     );
     return null;
@@ -58,7 +57,7 @@ export async function extractPackageFile(
 
   if (!rootInputs) {
     logger.debug(
-      { packageLockFile, error: flakeLockParsed.error },
+      { packageFile, error: flakeLockParsed.error },
       `flake.lock is missing "root" node`,
     );
 
@@ -87,7 +86,7 @@ export async function extractPackageFile(
     // istanbul ignore if: if we are not in a root node then original and locked always exist which cannot be easily expressed in the type
     if (flakeLocked === undefined || flakeOriginal === undefined) {
       logger.debug(
-        { packageLockFile, flakeInput },
+        { packageFile, flakeInput },
         `Found empty flake input, skipping`,
       );
       continue;
@@ -183,7 +182,7 @@ export async function extractPackageFile(
       // istanbul ignore next: just a safeguard
       default:
         logger.debug(
-          { packageLockFile },
+          { packageFile },
           `Unknown flake.lock type "${flakeLocked.type}", skipping`,
         );
         break;
