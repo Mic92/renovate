@@ -14,6 +14,7 @@ const InputType = z.enum([
 const LockedInput = z.object({
   ref: z.string().optional(),
   rev: z.string().optional(),
+  narHash: z.string().optional(),
   type: InputType,
   url: z.string().optional(),
 });

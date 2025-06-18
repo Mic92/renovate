@@ -87,6 +87,7 @@ export type PackageCacheNamespace =
   | 'datasource-jenkins-plugins'
   | 'datasource-maven:cache-provider'
   | 'datasource-maven:postprocess-reject'
+  | 'datasource-nix-flake'
   | 'datasource-node-version'
   | 'datasource-npm:cache-provider'
   | 'datasource-nuget-v3'
